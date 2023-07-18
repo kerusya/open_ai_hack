@@ -1,8 +1,8 @@
 FROM python:3.9-slim
 
 # RUN mkdir /app
-# EXPOSE 8080
-EXPOSE 5000
+EXPOSE 8080
+# EXPOSE 5000
 
 WORKDIR /app
 
