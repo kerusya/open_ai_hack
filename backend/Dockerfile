@@ -1,15 +1,20 @@
-FROM gradle:4.7.0-jdk8-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle build --no-daemon 
+FROM python:3.9-slim
 
-FROM openjdk:8-jre-slim
-
+# RUN mkdir /app
 EXPOSE 8080
+# EXPOSE 5000
 
-RUN mkdir /app
+WORKDIR /app
 
-COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+COPY requirements.txt requirements.txt
 
-ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
+RUN pip install -r requirements.txt
 
+COPY app/ .
+
+COPY templates /app/templates
+
+COPY static /app/static
+COPY data /app
+
+CMD [ "python", "./main.py" ]
