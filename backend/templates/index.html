@@ -28,6 +28,17 @@ h3{
   color: white;
 }
 
+.container {
+    display: flex;
+/*     background-color: blue; */
+    justify-content: space-around;
+    }
+    
+.container > textarea {
+    text-align: center;
+vertical-align: middle;
+/* line-height: 90px;   */
+    }
 
 </style>
 </head>
@@ -44,10 +55,18 @@ h3{
 
 <button type="submit" class="button">Big button</button>
 
+
 </form>
-<textarea style="background-color: transparent; height: 400px; width: 800px;">
-{{prediction_text}}
-</textarea>
+
+<div class='container'>
+    <textarea style="background-color: transparent; height: 400px; width: 800px;">
+    {{initial_text}}
+    </textarea>
+
+    <textarea style="background-color: transparent; height: 400px; width: 800px;">
+    {{prediction_text}}
+    </textarea>
+</div>
 </pre>
 </center>
 </body>

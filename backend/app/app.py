@@ -17,6 +17,8 @@ from langchain.output_parsers import ResponseSchema
 from langchain.output_parsers import StructuredOutputParser
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+import json
+
 
 app = Flask(__name__)
 
@@ -46,9 +48,10 @@ def generate_text():
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
     format_instructions = output_parser.get_format_instructions()
     
-    return_list = []
-
+    return_dict = {}
+    a = 0
     for document in nearest:
+        a +=1
         prompt_template = ChatPromptTemplate.from_template(template_string)
         message = prompt_template.format_messages(original_document=document,
                                               new_document=data,
@@ -57,10 +60,14 @@ def generate_text():
 
         response = chat(message)
         output_dict = output_parser.parse(response.content)
-        return_list.append(output_dict)
+        return_dict[a] = output_dict
+        
+    initial_texts = '\n'.join(nearest)
+    new_texts = json.dumps(return_dict, ensure_ascii = False,  separators=('\n', ':'))
+    
 
     # Return generated text as JSON response
-    return render_template('index.html', prediction_text= return_list) 
+    return render_template('index.html', prediction_text= new_texts, initial_text = initial_texts) 
 #     return jsonify({'generated_text': get_completion(payload['prompt'])})
 
 if __name__ == '__main__':
