@@ -38,7 +38,7 @@ def generate_text():
     tokenizer = AutoTokenizer.from_pretrained("cointegrated/rubert-tiny")
     model = AutoModel.from_pretrained("cointegrated/rubert-tiny")
     vector = embed_bert_cls(data, model, tokenizer)
-    nearest = search_content(number_sent, vector)
+    nearest, ids = search_content(number_sent, vector)
     
     chat = ChatOpenAI(openai_api_key=openai.api_key, temperature=0)
     changed_schema = ResponseSchema(name='Changed', description=changed_schema_description)
@@ -50,7 +50,7 @@ def generate_text():
     
     return_dict = {}
     a = 0
-    for document in nearest:
+    for i, document in enumerate(nearest):
         a +=1
         prompt_template = ChatPromptTemplate.from_template(template_string)
         message = prompt_template.format_messages(original_document=document,
@@ -60,7 +60,7 @@ def generate_text():
 
         response = chat(message)
         output_dict = output_parser.parse(response.content)
-        return_dict[a] = output_dict
+        return_dict[ids[i]] = output_dict
         
     initial_texts = '\n'.join(nearest)
     new_texts = json.dumps(return_dict, ensure_ascii = False,  separators=('\n', ':'))
