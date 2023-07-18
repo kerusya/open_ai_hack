@@ -21,23 +21,25 @@ def embed_bert_cls(text, model, tokenizer):
 
 def search_content(number_sent, input_vector):
 
-    conn = sqlite3.connect('text_db.db')
+    conn = sqlite3.connect('fin_db.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM text_db")
+    cursor.execute("SELECT * FROM fin_db")
     rows = cursor.fetchall()
    
     distances = []
     for row in rows:
         vector = [float(x) for x in row[1].split(',')]
         distance = cosine(input_vector, vector)
-        distances.append((distance, row[1], row[0])) 
+        distances.append((distance, row[1], row[0],row[2])) 
         
     distances.sort(key=lambda x: x[0])
 
     conn.close()
     out = []
+    ids = []
     for i in range(number_sent):
-        out.append(distances[i][2])
+        out.append(distances[i][3])
+        ids.append(distances[i][2])
         
-    return out
+    return out, ids
 
