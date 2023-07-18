@@ -17,4 +17,4 @@ COPY templates /app/templates
 COPY static /app/static
 COPY data /app
 
-CMD [ "python", "./app.py" ]
+CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8080"]
