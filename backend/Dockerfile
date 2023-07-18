@@ -15,5 +15,6 @@ COPY app/ .
 COPY templates /app/templates
 
 COPY static /app/static
+COPY data /app
 
 CMD [ "python", "./main.py" ]
