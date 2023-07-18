@@ -15,7 +15,7 @@ background-color: #23b83c;
 	box-shadow: 3px 3px 8px 0 #000; 
 }
 body {
-  background-image: url("{{url_for('static', filename='background.jpg')}}");
+  background-image: url("{{url_for('static', filename='background_bot.jpg')}}");
   background-repeat: no-repeat;
  background-size: 100% 100%;
 }
@@ -39,13 +39,13 @@ h3{
 <pre>
 <form action="{{ url_for('generate_text')}}"method="post">
 
-<input type='text' name="area" placeholder="Area in sq. ft" required="required"/>
+<input type='text' name="area" placeholder="Insert text here" required="required" style ="height: 150px; width: 300px; background-color: transparent;">
 
 
 <button type="submit" class="button">Big button</button>
 
 </form>
-<textarea rows= 20>
+<textarea style="background-color: transparent; height: 400px; width: 800px;">
 {{prediction_text}}
 </textarea>
 </pre>

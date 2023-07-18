@@ -7,8 +7,16 @@ import csv
 import numpy as np
 from scipy.spatial.distance import cosine
 from utils import number_sent
+from utils import changed_schema_description
+from utils import new_text_schema_description
+from utils import template_string
+from utils import explanation_schema_description
 import torch
 from transformers import AutoTokenizer, AutoModel
+from langchain.output_parsers import ResponseSchema
+from langchain.output_parsers import StructuredOutputParser
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
 
 app = Flask(__name__)
 
@@ -27,26 +35,32 @@ def generate_text():
     data = str(request.form['area'])
     tokenizer = AutoTokenizer.from_pretrained("cointegrated/rubert-tiny")
     model = AutoModel.from_pretrained("cointegrated/rubert-tiny")
-    vector = embed_bert_cls('krasava', model, tokenizer)
+    vector = embed_bert_cls(data, model, tokenizer)
     nearest = search_content(number_sent, vector)
     
-    nearest.append(data)
-    req = ' ## '.join(nearest)
+    chat = ChatOpenAI(openai_api_key=openai.api_key, temperature=0)
+    changed_schema = ResponseSchema(name='Changed', description=changed_schema_description)
+    new_text_schema = ResponseSchema(name='New_text', description=new_text_schema_description)
+    explanation_schema = ResponseSchema(name='Explanation', description=explanation_schema_description)
+    response_schemas = [changed_schema, new_text_schema, explanation_schema]
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+    format_instructions = output_parser.get_format_instructions()
     
-#     prompt = request.json['prompt']
-    payload = {'prompt': str(req)}
-    # Generate text using OpenAI GPT API
-    def get_completion(prompt, model="gpt-3.5-turbo"):
-        messages = [{"role": "user", "content": prompt}]
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=messages,
-            temperature=0,
-        )
-        return response.choices[0].message["content"] 
+    return_list = []
+
+    for document in nearest:
+        prompt_template = ChatPromptTemplate.from_template(template_string)
+        message = prompt_template.format_messages(original_document=document,
+                                              new_document=data,
+                                              format_instructions=format_instructions)
+
+
+        response = chat(message)
+        output_dict = output_parser.parse(response.content)
+        return_list.append(output_dict)
 
     # Return generated text as JSON response
-    return render_template('index.html',prediction_text= get_completion(payload['prompt'])) 
+    return render_template('index.html', prediction_text= return_list) 
 #     return jsonify({'generated_text': get_completion(payload['prompt'])})
 
 if __name__ == '__main__':
