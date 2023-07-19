@@ -1,38 +1,9 @@
-# Gradle Docker Codefresh example
+# LedlBot description
+This folder contains the basic logic of the application.
 
-This is an example Java application that uses Spring Boot 2, Gradle and Docker
-It is compiled using Codefresh.
+LeDlBot is an innovative AI assistant that automates the process of updating and writing internal bank documents in the face of changing legislation. It uses OpenAI APIs and large language models to analyze new legal acts, highlight key information and suggest appropriate changes to the bank's existing documents. LeDlBot enables the bank to reduce the time and effort spent on manual updating of documents, ensures compliance with legislation and improves operational efficiency.
 
-If you are looking for Maven, then see this [example](https://github.com/codefresh-contrib/spring-boot-2-sample-app)
+## To use this project in Codenrock
 
-## Create a multi-stage docker image
-
-To compile and package using Docker multi-stage builds
-
-```bash
-docker build . -t my-app
-```
-
-## Create a Docker image packaging an existing jar
-
-```bash
-./gradlew build
-docker build . -t my-app -f Dockerfile.only-package
-```
-
-## To run the docker image
-
-```bash
-docker run -p 8080:8080 my-app
-```
-
-And then visit http://localhost:8080 in your browser.
-
-## To use this project in Codefresh
-
-There is also a [codefresh.yml](codefresh.yml) for easy usage with the [Codefresh](codefresh.io) CI/CD platform.
-
-For the simple packaging pipeline see [codefresh-package-only.yml](codefresh-package-only.yml)
-
-More details can be found in [Codefresh documentation](https://codefresh.io/docs/docs/learn-by-example/java/gradle/)
+https://open-ai-api-backend-7909.raiff2023.codenrock.com/
 
