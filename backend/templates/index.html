@@ -18,6 +18,7 @@ body {
   background-image: url("{{url_for('static', filename='background_bot.jpg')}}");
   background-repeat: no-repeat;
  background-size: 100% 100%;
+ z-index: 0;
 }
 h1{
    background-color: Green;
@@ -38,7 +39,9 @@ h3{
     text-align: center;
 vertical-align: middle;
 background-color: white;
-font-size: 20;
+font-size: 15;
+z-index: 1; 
+position: relative;
 /* line-height: 90px;   */
     }
 
@@ -52,7 +55,7 @@ font-size: 20;
 <pre>
 <form action="{{ url_for('generate_text')}}"method="post">
 
-<input type='text' name="area" placeholder="Insert text here" required="required" style ="height: 150px; width: 900px; background-color: transparent;">
+<input type='text' name="area" placeholder="Insert text of change here" required="required" style ="height: 150px; width: 900px; background-color: transparent;">
 
 
 <button type="submit" class="button">Big button</button>

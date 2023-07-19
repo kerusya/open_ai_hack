@@ -34,41 +34,47 @@ def home():
 @app.route('/generate_text', methods=['POST'])
 def generate_text():
     # Get prompt from request body
-    data = str(request.form['area'])
-    tokenizer = AutoTokenizer.from_pretrained("cointegrated/rubert-tiny")
-    model = AutoModel.from_pretrained("cointegrated/rubert-tiny")
-    vector = embed_bert_cls(data, model, tokenizer)
-    nearest, ids = search_content(number_sent, vector)
-    
-    chat = ChatOpenAI(openai_api_key=openai.api_key, temperature=0)
-    changed_schema = ResponseSchema(name='Changed', description=changed_schema_description)
-    new_text_schema = ResponseSchema(name='New_text', description=new_text_schema_description)
-    explanation_schema = ResponseSchema(name='Explanation', description=explanation_schema_description)
-    response_schemas = [changed_schema, new_text_schema, explanation_schema]
-    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-    format_instructions = output_parser.get_format_instructions()
-    
-    return_dict = {}
-    a = 0
-    for i, document in enumerate(nearest):
-        a +=1
-        prompt_template = ChatPromptTemplate.from_template(template_string)
-        message = prompt_template.format_messages(original_document=document,
-                                              new_document=data,
-                                              format_instructions=format_instructions)
+    try:
+        data = str(request.form['area'])
+        tokenizer = AutoTokenizer.from_pretrained("cointegrated/rubert-tiny")
+        model = AutoModel.from_pretrained("cointegrated/rubert-tiny")
+        vector = embed_bert_cls(data, model, tokenizer)
+        nearest, ids = search_content(number_sent, vector)
+
+        chat = ChatOpenAI(openai_api_key=openai.api_key, temperature=0)
+        changed_schema = ResponseSchema(name='Changed', description=changed_schema_description)
+        new_text_schema = ResponseSchema(name='New_text', description=new_text_schema_description)
+        explanation_schema = ResponseSchema(name='Explanation', description=explanation_schema_description)
+        response_schemas = [changed_schema, new_text_schema, explanation_schema]
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        format_instructions = output_parser.get_format_instructions()
+
+        return_dict = {}
+        a = 0
+        for i, document in enumerate(nearest):
+            a +=1
+            prompt_template = ChatPromptTemplate.from_template(template_string)
+            message = prompt_template.format_messages(original_document=document,
+                                                  new_document=data,
+                                                  format_instructions=format_instructions)
 
 
-        response = chat(message)
-        output_dict = output_parser.parse(response.content)
-        return_dict[ids[i]] = output_dict
-        
-    initial_texts = '\n'.join(nearest)
-    new_texts = json.dumps(return_dict, ensure_ascii = False,  separators=('\n', ':'))
-    
+            response = chat(message)
+            output_dict = output_parser.parse(response.content)
+            return_dict[ids[i]] = output_dict
 
-    # Return generated text as JSON response
-    return render_template('index.html', prediction_text= new_texts, initial_text = initial_texts) 
+        initial_texts = '\n\n'.join(nearest)
+
+        try:
+            new_texts = json.dumps(return_dict, ensure_ascii = False,  separators=('\n\n', ':'))
+        except:
+            new_texts = return_dict
+
+        # Return generated text as JSON response
+        return render_template('index.html', prediction_text= new_texts, initial_text = initial_texts) 
 #     return jsonify({'generated_text': get_completion(payload['prompt'])})
+    except:
+        return render_template('index.html', prediction_text= '-', initial_text = 'Chatgpt unavailable') 
 
 if __name__ == '__main__':
 #     app.debug = True
