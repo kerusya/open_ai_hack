@@ -21,9 +21,9 @@ def embed_bert_cls(text, model, tokenizer):
 
 def search_content(number_sent, input_vector):
 
-    conn = sqlite3.connect('fin_db.db')
+    conn = sqlite3.connect('fin_db2.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM fin_db")
+    cursor.execute("SELECT * FROM fin_db2")
     rows = cursor.fetchall()
    
     distances = []
